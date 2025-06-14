@@ -17,3 +17,7 @@ Our project relied on two datasets:
 - Analyzed anonymized datasets covering disbursements, recipients, and properties.​
 - Developed dynamic Power BI reports for both high-level and detailed financial tracking.​
 - Created virtualization reports.
+
+## Reports
+- DisbursementReport.png displays a comprehensive dashboard of static data regarding the given apartment complexes. It allows the flexibility of seeing the overall picture and being able to drill down into each state or individual complex. The layout of visuals allows users to navigate the data smoothly. This display also ensures users are only seeing data relevant to their desired level of granularity.
+- Insight.png shows percentage of the different of different types of disbursement status either completed, expired, errored, pending, revoked, in progress, and you can see there is more disbursement are completed than other status. In the card there are total, completed, and non-completed amount  of disbursement and to show that there are more amount of completed disbursement than non-completed disbursement. 
