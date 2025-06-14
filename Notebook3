@@ -1,0 +1,43 @@
+#Heatmap 
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+df = spark.read.table("Sanitized_Refund_Lakehouse.income_insights_final")
+
+numeric_cols = [
+    "MedianIncome", "completion_rate", "expiration_rate",
+    "avg_feedback", "single_party_count", "multi_party_count"
+]
+
+df_clean = df.select(numeric_cols).dropna()
+data = df_clean.toPandas()
+
+corr = data.corr().round(3)
+
+pivoted_corr_df = corr.reset_index().rename(columns={"index": "Variable"})
+pivoted_corr_sdf = spark.createDataFrame(pivoted_corr_df)
+pivoted_corr_sdf.write.mode("overwrite").saveAsTable("Sanitized_Refund_Lakehouse.income_correlation_matrix")
+
+flat_corr_df = corr.reset_index().melt(id_vars="index")
+flat_corr_df.columns = ["VariableX", "VariableY", "Correlation"]
+flat_corr_df = flat_corr_df[flat_corr_df["VariableX"] <= flat_corr_df["VariableY"]]
+flat_corr_sdf = spark.createDataFrame(flat_corr_df)
+flat_corr_sdf.write.mode("overwrite").saveAsTable("Sanitized_Refund_Lakehouse.income_correlation_flat")
+
+fig, ax = plt.subplots(figsize=(9, 7))
+cax = ax.matshow(corr, cmap='coolwarm', vmin=-1, vmax=1)
+
+ax.set_xticks(range(len(corr.columns)))
+ax.set_yticks(range(len(corr.columns)))
+ax.set_xticklabels(corr.columns, rotation=45, ha='left')
+ax.set_yticklabels(corr.columns)
+
+for (i, j), val in np.ndenumerate(corr.values):
+    ax.text(j, i, f"{val:.2f}", ha='center', va='center', color='black')
+
+plt.colorbar(cax, fraction=0.046, pad=0.04)
+plt.title("Correlation Matrix")
+plt.tight_layout()
+plt.show()
