@@ -1,0 +1,40 @@
+# Fabric Notebook: Plot MedianIncome vs Completion/Expiration Rate by IncomeGroup
+
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+
+# Load the dataset
+df = spark.read.table("Sanitized_Refund_Lakehouse.income_insights_final")
+selected_df = df.select("MedianIncome", "completion_rate", "expiration_rate", "IncomeGroup").dropna()
+pdf = selected_df.toPandas()
+
+# Plot by IncomeGroup
+plt.figure(figsize=(10, 7))
+groups = pdf["IncomeGroup"].unique()
+
+for group in groups:
+    group_data = pdf[pdf["IncomeGroup"] == group]
+    x = group_data["MedianIncome"]
+    # Completion Rate
+    y1 = group_data["completion_rate"]
+    m1, b1 = np.polyfit(x, y1, 1)
+    plt.plot(x, m1*x + b1, label=f"{group} - Completion", linestyle='-', linewidth=2)
+  
+
+    # Expiration Rate
+    y2 = group_data["expiration_rate"]
+    m2, b2 = np.polyfit(x, y2, 1)
+    plt.plot(x, m2*x + b2, label=f"{group} - Expiration", linestyle='-', linewidth=2)
+
+
+# Formatting
+plt.scatter(pdf["MedianIncome"], pdf["completion_rate"], alpha=0.4, color='blue', label='Data Points')
+plt.scatter(pdf["MedianIncome"], pdf["expiration_rate"], alpha=0.4, color='orange', label='Data Points', )
+plt.xlabel("Median Income")
+plt.ylabel("Rate")
+plt.title("Completion and Expiration Rate vs Median Income by Income Group")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
