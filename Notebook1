@@ -1,0 +1,47 @@
+#correlation matrix
+df = spark.read.table("Sanitized_Refund_Lakehouse.income_insights_final")
+pdf = df.toPandas()
+
+
+numeric_cols = [
+    "MedianIncome", "completion_rate", "expiration_rate", 
+    "avg_feedback", "single_party_count", "multi_party_count"
+]
+
+import pandas as pd
+import numpy as np
+from scipy.stats import pearsonr
+
+
+corr_matrix = pdf[numeric_cols].corr().round(3)
+corr_matrix_df = corr_matrix.reset_index().melt(id_vars="index")
+corr_matrix_df.columns = ["Variable X", "Variable Y", "Correlation"]
+corr_matrix_df = corr_matrix_df[corr_matrix_df["Variable X"] <= corr_matrix_df["Variable Y"]]
+
+results = []
+for var in numeric_cols:
+    if var != "MedianIncome":
+        valid = pdf[["MedianIncome", var]].dropna()
+        if len(valid) > 2:
+            r, p = pearsonr(valid["MedianIncome"], valid[var])
+            results.append({
+                "Variable": var,
+                "CorrelationWithMedianIncome": round(r, 3),
+                "PValue": round(p, 5)
+            })
+
+median_corr_df = pd.DataFrame(results)
+
+
+corr_matrix_sdf = spark.createDataFrame(corr_matrix_df)
+median_corr_sdf = spark.createDataFrame(median_corr_df)
+
+corr_matrix_sdf.write.mode("overwrite").saveAsTable("your_lakehouse_schema.full_correlation_matrix")
+median_corr_sdf.write.mode("overwrite").saveAsTable("your_lakehouse_schema.median_income_correlation_with_pvalues")
+
+display(corr_matrix_sdf)
+display(median_corr_sdf)
+
+
+
+
