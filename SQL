@@ -1,0 +1,129 @@
+# Join income, education, population, and poverty data using the zip code as the key
+SELECT 
+    zip.Zip,
+    zip.City,
+    zip.State,
+
+    inc.MedianIncome,
+    edu.EducationRate,
+    pop.TotalPopulation,
+    pov.PovertyRate
+
+FROM All_us_zip_codes AS zip
+LEFT JOIN IncomeData AS inc
+    ON zip.Zip = inc.Zip
+LEFT JOIN EducationData AS edu
+    ON zip.Zip = edu.Zip
+LEFT JOIN PopulationData AS pop
+    ON zip.Zip = pop.Zip
+LEFT JOIN PovertyData AS pov
+    ON zip.Zip = pov.Zip
+
+# Store result in new table
+CREATE TABLE ConsolidatedZipData AS
+SELECT 
+    zip.Zip,
+    zip.City,
+    zip.State,
+    inc.MedianIncome,
+    edu.EducationRate,
+    pop.TotalPopulation,
+    pov.PovertyRate
+FROM All_us_zip_codes AS zip
+LEFT JOIN IncomeData AS inc ON zip.Zip = inc.Zip
+LEFT JOIN EducationData AS edu ON zip.Zip = edu.Zip
+LEFT JOIN PopulationData AS pop ON zip.Zip = pop.Zip
+LEFT JOIN PovertyData AS pov ON zip.Zip = pov.Zip;
+
+
+
+# Expiration and Completion Rate per ZIP Code
+
+from pyspark.sql.functions import col, count, when, round
+
+# Group and count total, expired, and completed disbursements per zip
+zip_stats_df = disbursements_with_zip.groupBy("zip_code").agg(
+    count("*").alias("total_disbursements"),
+    count(when(col("disbursement_status") == "Expired", True)).alias("expired_count"),
+    count(when(col("disbursement_status") == "Complete", True)).alias("completed_count")
+)
+
+# Calculate rates
+zip_rates_df = zip_stats_df \
+    .withColumn("expiration_rate", round(col("expired_count") / col("total_disbursements"), 3)) \
+    .withColumn("completion_rate", round(col("completed_count") / col("total_disbursements"), 3))
+
+# Show the result
+display(zip_rates_df)
+
+
+# Join the income/city info into the rates
+zip_rates_with_income = zip_rates_df.join(
+    income_data_df.select("zip_code", "median_income", "city"), 
+    on="zip_code", 
+    how="left"
+)
+
+# Preview the result
+display(zip_rates_with_income)
+
+
+# Create new column for low, median , and high income levels
+from pyspark.sql.functions import when
+
+zip_rates_with_income = zip_rates_with_income.withColumn(
+    "income_group",
+    when(col("median_income") < 45000, "Low")
+    .when((col("median_income") >= 45000) & (col("median_income") <= 75000), "Middle")
+    .when(col("median_income") > 75000, "High")
+    .otherwise("Unknown")
+)
+
+zip_rates_with_income.write.mode("overwrite").saveAsTable("zip_rates_income_buckets")
+
+
+#Calculate Expiration and Completion Rates by ZIP
+from pyspark.sql.functions import col, count, when, round
+
+# Group and count total, expired, and completed disbursements per ZIP
+zip_stats_df = disbursements_with_zip.groupBy("Zip").agg(
+    count("*").alias("total_disbursements"),
+    count(when(col("DisbursementStatusName") == "Expired", True)).alias("expired_count"),
+    count(when(col("DisbursementStatusName") == "Complete", True)).alias("completed_count")
+)
+
+# Calculate rates
+zip_rates_df = zip_stats_df \
+    .withColumn("expiration_rate", round(col("expired_count") / col("total_disbursements"), 3)) \
+    .withColumn("completion_rate", round(col("completed_count") / col("total_disbursements"), 3))
+
+# Show the result
+display(zip_rates_df)
+
+
+# Load tables
+feedback_df = spark.read.table("df_SAN_Reciepent_Feedback")
+recipient_payments_df = spark.read.table("df_SAN_Reciepent_Payments")
+disbursements_df = spark.read.table("disbursements_with_zip")
+income_df = spark.read.table("income_data")
+
+# Join feedback → payments (get DisbursementsId)
+feedback_with_disb_id = feedback_df.join(
+    recipient_payments_df.select("RecipientsId", "DisbursementsId"),
+    on="RecipientsId",
+    how="inner"
+)
+
+# Join to disbursements
+feedback_disb_df = feedback_with_disb_id.join(
+    disbursements_df,
+    on="DisbursementsId",
+    how="inner"
+)
+
+# Join with income on zip
+master_df = feedback_disb_df.join(
+    income_df.select(col("zip_code").alias("ZipCode"), "MedianIncome"),
+    feedback_disb_df["Zip"] == col("ZipCode"),
+    how="left"
+).drop("ZipCode")
