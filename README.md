@@ -15,7 +15,6 @@ Our project relied on two datasets:
 ## Project Files
 
 - `DAX_Formulas`: DAX formulas used in Power BI Desktop to analyze data for visualizations.
-- `Education_By_ZipCode.csv`: A CSV file containing cleaned and sorted education level data by zip code from http://census.gov/.
 - `Notebook 1`: Python code to create a correlation matrix between median income and disbursement data in Power BI Desktop. 
 - `Notebook 2`: Python code to create a scatter plot showing MedianIncome vs Completion/Expiration Rate by IncomeGroup in Power BI Desktop.
 - `Notebook 3`: Python code to create a heatmap showing the correlations between median income and disbursement data in Power BI Desktop.
@@ -23,8 +22,9 @@ Our project relied on two datasets:
 - `Notebook 5`: Python code to create a scatter plot showing the top 5 expiration zip codes and lowest 5 income zip codes in Power BI Desktop. 
 - `Notebook 6`: Python code to create a scatter Plot with 2 Y-Variables and Data Point Labels in Power BI Desktop.
 - `SQL`: PySpark SQL code to create tables, join tables, and analyze data.
-- `income data padded.csv`: A CSV file containing cleaned and sorted income data by zip code from http://census.gov/.
 - `FinalReport.pbix`: Final Power BI report containing the entire groups work.
+- `Education_By_ZipCode.csv`: A CSV file containing cleaned and sorted education level data by zip code from http://census.gov/.
+- `income data padded.csv`: A CSV file containing cleaned and sorted income data by zip code from http://census.gov/.
 
 ---
 
