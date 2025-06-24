@@ -1,0 +1,47 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Prepare data
+df = dataset.dropna()
+df['Zip'] = df['Zip'].astype(str)
+
+# Categorize income groups
+df['IncomeGroup'] = pd.cut(
+    df['MedianIncome'],
+    bins=[0, 40000, 80000, float('inf')],
+    labels=["Low Income", "Middle Income", "High Income"]
+)
+
+# Find top 5 expiration ZIPs and lowest 5 income ZIPs
+top_expiration = df.sort_values(by='ExpirationRate', ascending=False).head(5)
+low_income = df.sort_values(by='MedianIncome', ascending=True).head(5)
+
+# Create the scatter plot
+plt.figure(figsize=(10, 7))
+sns.scatterplot(
+    data=df,
+    x='MedianIncome',
+    y='ExpirationRate',
+    hue='IncomeGroup',
+    palette='Set2',
+    alpha=0.7,
+    s=100
+)
+
+# Label top 5 Expiration ZIPs
+for _, row in top_expiration.iterrows():
+    plt.text(row['MedianIncome'] + 800, row['ExpirationRate'], f"{row['Zip']}", fontsize=9, color='red')
+
+# Label bottom 5 Income ZIPs
+for _, row in low_income.iterrows():
+    plt.text(row['MedianIncome'] + 800, row['ExpirationRate'], f"{row['Zip']}", fontsize=9, color='green')
+
+# Show results
+plt.title("Expiration Rate vs Median Income (Key ZIPs Highlighted)")
+plt.xlabel("Median Income")
+plt.ylabel("Expiration Rate")
+plt.ylim(0, 1)
+plt.grid(True)
+plt.tight_layout()
+plt.show()
