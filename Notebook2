@@ -1,4 +1,4 @@
-# Fabric Notebook: Plot MedianIncome vs Completion/Expiration Rate by IncomeGroup
+# Plot MedianIncome vs Completion/Expiration Rate by IncomeGroup
 
 import matplotlib.pyplot as plt
 import numpy as np
