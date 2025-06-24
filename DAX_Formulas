@@ -1,0 +1,128 @@
+# Find total amount of disbursements by state
+Total Amount By State = 
+CALCULATE(
+    SUM(new_df_san_disbursements[TotalAmount]),
+    ALLEXCEPT(new_san_apt_ref, new_san_apt_ref[State])
+)
+
+# Calculate number of complete disbursements
+Count_Complete = 
+CALCULATE(
+    COUNT(new_df_san_disbursements[DisbursementsId]),
+    new_df_san_disbursements[DisbursementStatusName] = "Complete"
+)
+
+# Calculate number of expired disbursements 
+Count_Expired = 
+CALCULATE(
+    COUNT(new_df_san_disbursements[DisbursementsId]),
+    new_df_san_disbursements[DisbursementStatusName] = "Expired"
+)
+
+# Calculate number of pending disbursements 
+Count_Pending = 
+CALCULATE(
+    COUNT(new_df_san_disbursements[DisbursementsId]),
+    new_df_san_disbursements[DisbursementStatusName] = "Pending"
+)
+
+# Calculate number of revoked disbursements 
+Count_Revoked = 
+CALCULATE(
+    COUNT(new_df_san_disbursements[DisbursementsId]),
+    new_df_san_disbursements[DisbursementStatusName] = "Revoked"
+)
+
+# Summary table 
+Disbursement Status Summary = 
+SUMMARIZE(
+    new_df_san_disbursements,
+    new_df_san_disbursements[DisbursementStatusName],
+    "Status Count", COUNT(new_df_san_disbursements[DisbursementsId])
+)
+
+# Calculate perctange of complete disbursements 
+Percent_Complete = 
+DIVIDE([Count_Complete], CALCULATE(COUNT(new_df_san_disbursements[DisbursementsId])), 0)
+
+# Calculate $ amount of complete disbursements
+Amount_Complete = 
+CALCULATE(
+    SUM(new_df_san_disbursements[TotalAmount]),
+    new_df_san_disbursements[DisbursementStatusName] = "Complete"
+)
+
+# Calculate $ amount of expired disbursements
+Amount_Expired = 
+CALCULATE(
+    SUM(new_df_san_disbursements[TotalAmount]),
+    new_df_san_disbursements[DisbursementStatusName] = "Expired"
+)
+
+# Calculate $ amount of pending disbursements
+Amount_Pending = 
+CALCULATE(
+    SUM(new_df_san_disbursements[TotalAmount]),
+    new_df_san_disbursements[DisbursementStatusName] = "Pending"
+)
+
+# Calculate $ amount of revoked disbursements
+Amount_Revoked = 
+CALCULATE(
+    SUM(new_df_san_disbursements[TotalAmount]),
+    new_df_san_disbursements[DisbursementStatusName] = "Revoked"
+)
+
+# Calculate the total disbursement amount across all types
+Total_Disbursement_Amount = 
+SUM(new_df_san_disbursements[TotalAmount])
+
+# Calculate the percentage of each disbursement type relative to the total
+Percent_Complete = 
+DIVIDE([Amount_Complete], [Total_Disbursement_Amount], 0)
+
+# Dynamic apartment count by city 
+Apartments_Count_in_City = 
+CALCULATE(
+    COUNT(new_san_apt_ref[SanitizedName]),
+    ALLEXCEPT(new_san_apt_ref, new_san_apt_ref[City])
+)
+
+# Count of Complete Disbursements by City and State:
+Count_Complete_By_City_State = 
+CALCULATE(
+    COUNT(new_df_san_disbursements[DisbursementsId]),
+    new_df_san_disbursements[DisbursementStatusName] = "Complete",
+    ALLEXCEPT(new_san_apt_ref, new_san_apt_ref[City], new_san_apt_ref[State])
+)
+
+Count of Expired Disbursements by City and State:
+Count_Expired_By_City_State = 
+CALCULATE(
+    COUNT(new_df_san_disbursements[DisbursementsId]),
+    new_df_san_disbursements[DisbursementStatusName] = "Expired",
+    ALLEXCEPT(new_san_apt_ref, new_san_apt_ref[City], new_san_apt_ref[State])
+)
+
+Count of Pending Disbursements by City and State:
+Count_Pending_By_City_State = 
+CALCULATE(
+    COUNT(new_df_san_disbursements[DisbursementsId]),
+    new_df_san_disbursements[DisbursementStatusName] = "Pending",
+    ALLEXCEPT(new_san_apt_ref, new_san_apt_ref[City], new_san_apt_ref[State])
+)
+
+Count of Revoked Disbursements by City and State:
+Count_Revoked_By_City_State = 
+CALCULATE(
+    COUNT(new_df_san_disbursements[DisbursementsId]),
+    new_df_san_disbursements[DisbursementStatusName] = "Revoked",
+    ALLEXCEPT(new_san_apt_ref, new_san_apt_ref[City], new_san_apt_ref[State])
+)
+
+# Combine city and state
+City_State = 
+new_san_apt_ref[City] & ", " & new_san_apt_ref[State]
+
+
+
