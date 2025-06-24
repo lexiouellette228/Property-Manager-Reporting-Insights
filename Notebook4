@@ -1,1 +1,33 @@
+# Scatter plot with trendlines
+import matplotlib.pyplot as plt
+import numpy as np
 
+# Drop nulls
+data = dataset.dropna()
+
+x = data["MedianIncome"]
+
+# Scatter plot for completion rate
+y1 = data["completion_rate"]
+plt.scatter(x, y1, color='green', alpha=0.6, label='Completion Rate')
+
+# Trendline for completion rate
+m1, b1 = np.polyfit(x, y1, 1)
+plt.plot(x, m1 * x + b1, color='green')
+
+# Scatter plot for expiration rate
+y2 = data["expiration_rate"]
+plt.scatter(x, y2, color='red', alpha=0.6, label='Expiration Rate')
+
+# Trendline for expiration rate
+m2, b2 = np.polyfit(x, y2, 1)
+plt.plot(x, m2 * x + b2, color='red')
+
+# Plot setup
+plt.title("Median Income vs Completion & Expiration Rates (with Trendlines)")
+plt.xlabel("Median Income")
+plt.ylabel("Rate")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
