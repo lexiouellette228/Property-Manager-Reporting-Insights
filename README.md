@@ -34,6 +34,14 @@ Our project relied on two datasets:
 - Developed dynamic Power BI reports for both high-level and detailed financial tracking.​
 - Created virtualization reports.
 
+## Technologies  
+- Microsoft Fabric: For Lakehouse storage and PySpark SQL transformation
+- Power BI Desktop: For visual dashboards, DAX measures, and interactivity
+- Python (matplotlib, seaborn): For customized visuals and correlation plots
+- DAX: For dynamic field switching, KPI calculations, and group analysis
+
+---
+
 ## Report Screenshots
 - `Disbursement_Report.png`: displays a comprehensive dashboard of static data regarding the given apartment complexes. It allows the flexibility of seeing the overall picture and being able to drill down into each state or individual complex. The layout of visuals allows users to navigate the data smoothly. This display also ensures users are only seeing data relevant to their desired level of granularity.
   
