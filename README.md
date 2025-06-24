@@ -1,6 +1,6 @@
 # Property Manager Reporting & Insights
 
-This project focuses on leveraging data analytics to enhance the efficiency and transparency of rental deposit refund payments. The project analyzes anonymized datasets related to disbursements, recipients, and properties to provide critical financial insights. Key objectives include developing Power BI reports for high-level and granular performance tracking, identifying anomalies such as error spikes or payment expirations, and uncovering geographic and demographic trends impacting payment completion rates Utilizing Microsoft Fabric Lakehouse for data storage, along with SQL and Python for data processing, this project enhances decision-making through automated reporting.
+This project focuses on leveraging data analytics to enhance the efficiency and transparency of rental deposit refund payments. The project analyzes anonymized datasets related to disbursements, recipients, and properties to provide critical financial insights. Key objectives include developing Power BI reports for high-level and granular performance tracking, identifying anomalies such as error spikes or payment expirations, and uncovering geographic and demographic trends impacting payment completion rates. Utilizing Microsoft Fabric Lakehouse for data storage, along with SQL and Python for data processing, this project enhances decision-making through automated reporting.
 
 ## Data Sets
 Our project relied on two datasets: 
